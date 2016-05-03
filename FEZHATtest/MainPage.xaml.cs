@@ -49,7 +49,7 @@ namespace FEZHATtest
         private async void Setup()
         {
             this.hat = await FEZHAT.CreateAsync();
-            this.dist = new UltrasonicDistanceSensor(hat,false);
+            this.dist = new UltrasonicDistanceSensor(hat);
 
             this.hat.S1.SetLimits(500, 2400, 0, 180);
             this.hat.S2.SetLimits(500, 2400, 0, 180);

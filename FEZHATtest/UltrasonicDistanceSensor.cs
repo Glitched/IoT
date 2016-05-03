@@ -2,7 +2,6 @@
 using System;
 using System.Diagnostics;
 using System.Threading.Tasks;
-using Windows.Devices.Gpio;
 
 namespace FEZHATtest
 {
@@ -34,40 +33,21 @@ namespace FEZHATtest
             public const bool leading = true;
             public const bool trailing = false;
         }
-        private GpioPin _echoPin;
         private long _ticks;
-        private bool _useEvent;
-        private bool _complete;
+        //private bool _complete;
 
-        public UltrasonicDistanceSensor(FEZHAT hat, bool useEvent=false)
+        public UltrasonicDistanceSensor(FEZHAT hat)
         {
             _stopwatch = new Stopwatch();
             _ticks_per_second = Stopwatch.Frequency;
             _tick_resolution = (long)( RESOLUTION_cm * _ticks_per_second / SPEED_OF_SOUND_cmps * 2.0 );
             _hat = hat;
             _hat.WriteDigital(FEZHAT.DigitalPin.DIO26, false); // clear trigger
-            _useEvent = useEvent;
-            if (_useEvent)
-            {
-                //_echoPin = _hat.Dio16;
-                //_echoPin.SetDriveMode(GpioPinDriveMode.Input);
-                //_echoPin.ValueChanged += _echoPin_ValueChanged;
-            }
-        }
-
-        private void _echoPin_ValueChanged(GpioPin sender, GpioPinValueChangedEventArgs args)
-        {
-            if (args.Edge == GpioPinEdge.FallingEdge)
-            {
-                _ticks = _stopwatch.ElapsedTicks;
-                _complete = true;
-            }
         }
         public async Task<double> GetDistanceInCmAsync(int timeoutInMilliseconds)
         {
             double distance = MAX_DISTANCE_cm;
             _ticks=0L;
-            _complete = false;
             long ticktimeout = timeoutInMilliseconds * _ticks_per_second / 1000;
             bool find_edge = Edge.leading;
             try
@@ -77,11 +57,7 @@ namespace FEZHATtest
                 _stopwatch.Start();
                 while (_ticks < ticktimeout)
                 {
-                    if (_useEvent && _complete)
-                    {
-                        break;
-                    }
-                    else if(find_edge == _hat.ReadDigital(FEZHAT.DigitalPin.DIO16))
+                    if(find_edge == _hat.ReadDigital(FEZHAT.DigitalPin.DIO16))
                     {
                         if (find_edge) find_edge = Edge.trailing;
                         else break;
