@@ -15,6 +15,7 @@ using Windows.UI.Xaml.Navigation;
 using GHIElectronics.UWP.Shields;
 using System.Threading.Tasks;
 using System.Diagnostics;
+using Windows.System;
 
 // The Blank Page item template is documented at http://go.microsoft.com/fwlink/?LinkId=402352&clcid=0x409
 
@@ -37,7 +38,8 @@ namespace FEZHATtest
         private bool next;
         private RobotAction currentAction;
         private int speedmode = 0;
-        private int debounce = 0 ;
+        private int steering_calibration = 0;
+        private int debounce = 0;
         private UltrasonicDistanceSensor dist;
         public MainPage()
         {
@@ -76,16 +78,17 @@ namespace FEZHATtest
 
         private void PerformAction(double distval)
         {
-            if (distval > 20 && currentAction==RobotAction.forward)
+            if (distval > 20 && currentAction == RobotAction.forward)
             {
-                hat.MotorB.Speed = hat.MotorA.Speed = speedmode * .10 + .30;
+                hat.MotorA.Speed = speedmode * .40;
+                hat.MotorB.Speed = hat.MotorA.Speed + (speedmode * steering_calibration * .02);
             }
-            if(distval<20)
+            if (distval < 20)
             {
                 switch (currentAction)
                 {
                     case RobotAction.forward:
-                        hat.MotorA.Speed = speedmode * .10 + .30;
+                        hat.MotorA.Speed = speedmode * .40;
                         hat.MotorB.Speed = -hat.MotorA.Speed;
                         currentAction = RobotAction.turnright;
                         break;
@@ -113,7 +116,8 @@ namespace FEZHATtest
                 this.hat.D3.Color = FEZHAT.Color.Black;
                 this.hat.MotorA.Speed = 0.0;
                 this.hat.MotorB.Speed = 0.0;
-                Application.Current.Exit();
+                Shutdown();
+
             }
             if (this.hat.IsDIO18Pressed() && debounce == 0)
             {
@@ -128,11 +132,16 @@ namespace FEZHATtest
                 if (debounce < 0) debounce = 0;
             }
 
-            if (this.hat.IsDIO22Pressed())
+            if (this.hat.IsDIO22Pressed() && debounce == 0)
             {
+                debounce = 3;
+                steering_calibration++;
+                if (steering_calibration > 5) steering_calibration = -5;
             }
             else
             {
+                debounce--;
+                if (debounce < 0) debounce = 0;
             }
         }
 
@@ -155,5 +164,11 @@ namespace FEZHATtest
             this.hat.D3.Color = (speedmode == 0 ? FEZHAT.Color.Red : speedmode == 1 ? FEZHAT.Color.Yellow : FEZHAT.Color.Green);
 
         }
+
+        private void Shutdown()
+        {
+            ShutdownManager.BeginShutdown(ShutdownKind.Shutdown, TimeSpan.FromSeconds(1.0));
+        }
+
     }
 }
