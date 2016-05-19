@@ -41,6 +41,8 @@ namespace FEZHATtest
         private int steering_calibration = 0;
         private int debounce = 0;
         private UltrasonicDistanceSensor dist;
+        private double[] lastAccel;
+        private int lastAccelPos = 0;
         public MainPage()
         {
             this.InitializeComponent();
@@ -50,6 +52,7 @@ namespace FEZHATtest
 
         private async void Setup()
         {
+            lastAccel = new double[10];
             this.hat = await FEZHAT.CreateAsync();
             this.dist = new UltrasonicDistanceSensor(hat);
 
@@ -63,25 +66,29 @@ namespace FEZHATtest
             this.timer.Tick += this.OnTick;
             this.timer.Start();
         }
-
+        private double t = 0.0;
         private async void OnTick(object sender, object e)
         {
             var distval = await dist.GetDistanceInCmAsync(50);
             UpdateDisplay(distval);
-
+            t += .3;
             this.next = !this.next;
 
             CheckButtons();
 
             PerformAction(distval);
         }
-
+        // ternary( condition ? trueresult : falseresult )
         private void PerformAction(double distval)
         {
             if (distval > 20 && currentAction == RobotAction.forward)
             {
-                hat.MotorA.Speed = speedmode * .40;
-                hat.MotorB.Speed = hat.MotorA.Speed + (speedmode * steering_calibration * .02);
+                // sinewave varriation
+                var speed = speedmode * 0.4;
+                var speeda = speed * -(Math.Sin(t) * 0.4) + speed;
+                var speedb = (speed + (speedmode * steering_calibration * .02)) * (Math.Sin(t) * 0.4) + speed + (speedmode * steering_calibration * .02);
+                hat.MotorA.Speed = (speeda<-1.0?-1.0:(speeda>1.0?1.0: speeda));
+                hat.MotorB.Speed = (speedb < -1.0 ? -1.0 : speedb > 1.0 ? 1.0 : speedb);
             }
             if (distval < 20)
             {
@@ -148,10 +155,14 @@ namespace FEZHATtest
         private void UpdateDisplay(double distval)
         {
             double x, y, z;
+            double totalAccel = 0.0;
             this.hat.GetAcceleration(out x, out y, out z);
+            lastAccel[lastAccelPos++] = x*x + y*y + z*z;
+            if (lastAccelPos == lastAccel.Length) lastAccelPos = 0;
+            totalAccel = Math.Abs(lastAccel.Sum()-2.4)*100;
             this.LightTextBox.Text = this.hat.GetLightLevel().ToString("P2");
             this.TempTextBox.Text = this.hat.GetTemperature().ToString("N2");
-            this.AccelTextBox.Text = $"({x:N2}, {y:N2}, {z:N2})";
+            this.AccelTextBox.Text = totalAccel.ToString();// $"({x:N2}, {y:N2}, {z:N2})";
             this.Button18TextBox.Text = this.hat.IsDIO18Pressed().ToString();
             this.Button22TextBox.Text = this.hat.IsDIO22Pressed().ToString();
             this.AnalogTextBox.Text = this.hat.ReadAnalog(FEZHAT.AnalogPin.Ain1).ToString("N2");
@@ -161,8 +172,14 @@ namespace FEZHATtest
             this.hat.DIO24On = this.next;
 
             this.hat.D2.Color = (distval < 20 ? FEZHAT.Color.Red : distval < 40 ? FEZHAT.Color.Yellow : FEZHAT.Color.Blue);
-            this.hat.D3.Color = (speedmode == 0 ? FEZHAT.Color.Red : speedmode == 1 ? FEZHAT.Color.Yellow : FEZHAT.Color.Green);
+            this.hat.D2.Color = new FEZHAT.Color((byte)(this.hat.D2.Color.R * totalAccel / 10),
+                                    (byte)(this.hat.D2.Color.G * totalAccel/10),
+                                    (byte)(this.hat.D2.Color.B * totalAccel/10));
 
+            this.hat.D3.Color = (speedmode == 0 ? FEZHAT.Color.Red : speedmode == 1 ? FEZHAT.Color.Yellow : FEZHAT.Color.Green);
+            this.hat.D3.Color = new FEZHAT.Color((byte)(this.hat.D3.Color.R * totalAccel / 10),
+                                    (byte)(this.hat.D3.Color.G * totalAccel / 10),
+                                    (byte)(this.hat.D3.Color.B * totalAccel / 10));
         }
 
         private void Shutdown()
