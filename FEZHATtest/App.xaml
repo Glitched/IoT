@@ -1,8 +1,8 @@
 ﻿<Application
-    x:Class="FEZHATtest.App"
+    x:Class="RSRobot.App"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:local="using:FEZHATtest"
+    xmlns:local="using:RSRobot"
     RequestedTheme="Dark">
     
 </Application>

@@ -1,8 +1,8 @@
 ﻿<Page
-    x:Class="FEZHATtest.MainPage"
+    x:Class="RSRobot.MainPage"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:local="using:FEZHATtest"
+    xmlns:local="using:RSRobot"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d">
@@ -17,6 +17,22 @@
             <TextBlock Text="Leds: " />
             <TextBlock Text="Analog: " />
             <TextBlock Text="Distance: " />
+            <TextBlock Text="Pointer: " />
+
+            <TextBlock Text="Delta X: " />
+            <TextBlock Text="Delta Y: " />
+            <TextBlock Text="Delta Z: " />
+            
+            <TextBlock Text="Total Delta: " />
+            <TextBlock Text="Is Stopped: " />
+            <TextBlock Text="Stuck for: " />
+
+            <TextBlock Text="Wiggle Tracker: " />
+            <TextBlock Text="Should Wiggle: " />
+
+            <TextBlock Text="Motor A: " />
+            <TextBlock Text="Motor B: " />
+
         </StackPanel>
         <StackPanel Width="225"  Padding="0,30">
             <TextBlock Name="LightTextBox" />
@@ -27,6 +43,20 @@
             <TextBlock Name="LedsTextBox" />
             <TextBlock Name="AnalogTextBox" />
             <TextBlock x:Name="DistanceTextBox" />
+            <TextBlock Name="PointerTextBox" />
+
+            <TextBlock Name="XSumTextBox" />
+            <TextBlock Name="YSumTextBox" />
+            <TextBlock Name="ZSumTextBox" />
+
+            <TextBlock Name="SumTextBox" />
+            <TextBlock Name="GuessTextBox" />
+            <TextBlock Name="TimeTextBox" />
+
+            <TextBlock Name="TrackerTextBox" />
+            <TextBlock Name="WiggleTextBox" />
+            <TextBlock Name="ASpeedTextBox" />
+            <TextBlock Name="BSpeedTextBox" />
         </StackPanel>
     </StackPanel>
 </Page>

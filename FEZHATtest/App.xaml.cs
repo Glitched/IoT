@@ -16,7 +16,7 @@ using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
 using GHIElectronics.UWP.Shields;
 
-namespace FEZHATtest
+namespace RSRobot
 {
     /// <summary>
     /// Provides application-specific behavior to supplement the default Application class.

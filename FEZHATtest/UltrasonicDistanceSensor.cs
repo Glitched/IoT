@@ -3,7 +3,7 @@ using System;
 using System.Diagnostics;
 using System.Threading.Tasks;
 
-namespace FEZHATtest
+namespace RSRobot
 {
     //
     // MATH:
@@ -24,10 +24,10 @@ namespace FEZHATtest
         private readonly FEZHAT _hat;
         private readonly long _tick_resolution;
         private readonly long _ticks_per_second;
-        private const double PULSE_WIDTH_ms = 3.0; // sound from 1m away should be back in 3ms
-        private const double SPEED_OF_SOUND_cmps = 34030.0; // cm/sec
+        private const double PULSE_WIDTH_ms = 10.0; // sound from 1m away should be back in 3ms
+        private const double SPEED_OF_SOUND_cmps = 34029.0; // cm/sec
         private const double RESOLUTION_cm = 0.5; // cm
-        private const double MAX_DISTANCE_cm = 10000.0;
+        private const double MAX_DISTANCE_cm = 1000.0;
         private struct Edge
         {
             public const bool leading = true;
